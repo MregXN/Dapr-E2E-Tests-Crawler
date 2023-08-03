@@ -1,0 +1,5 @@
+__pycache__/
+.vscode/
+
+# generated during crawling
+test_report_e2e.xml
