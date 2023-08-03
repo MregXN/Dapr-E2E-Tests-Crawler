@@ -100,7 +100,6 @@ class FailureLogCrawler:
                         testcase_info = TestCaseInfo(name, os, latest_url)
                         self.fail_testcase_dict[name] = testcase_info
 
-    # to do : get_fail_rate()
     def list_failure_testcase(self):
         print("\n")
         print("Failed Test Cases:")

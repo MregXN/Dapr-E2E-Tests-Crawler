@@ -19,7 +19,7 @@ class WorkFlowScaner:
         self.headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
-            "Authorization": f"token {access_token}",
+            "Authorization": f"token {access_token}"
         }
         self.crawler = FailureLogCrawler(repo, access_token)
 
@@ -50,9 +50,6 @@ class WorkFlowScaner:
     def get_pass_rate(self):
         pass_rate = self.success_num / self.runs_len
         return pass_rate
-
-    def get_failure_id(self):
-        return self.failure_id
 
     def list_failure_case(self):
         self.crawler.crawl(self.failure_id, self.runs_len)
