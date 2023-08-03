@@ -1,18 +1,17 @@
 # Dapr E2E Tests Crawler
-This is a Python script that scrapes the Dapr E2E tests results in Github Action.
+This is a Python script that scrapes the Dapr E2E tests results in Github Action scheduled workflow.
 
 
 
 ## Usage
-1. Clone the repository:
+**1. Clone the repository:**
 
-```
+```shell
 git clone https://github.com/username/dapr-e2e-test-scraper.git 
-
 ```
 
-2. Replace values in global_settings.py 
-```
+**2. Replace values in global_settings.py** 
+```python
 # Follow the style of "<OWNER>/<REPO>"
 REPO = "MregXN/dapr"
 
@@ -26,9 +25,9 @@ ACCSS_TOKEM = "<REPLACE_WITH_YOUR_TOKEN>"
 GITHUB_API_PARAMETER = {"per_page": "100"}
 ```
 
-3. Run the script:
-```
-python __init__.py 
+**3. Run the script:**
+```shell
+python3 __init__.py 
 ```
 
 ## Result
