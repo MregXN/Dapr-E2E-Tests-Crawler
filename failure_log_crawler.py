@@ -109,9 +109,10 @@ class FailureLogCrawler:
                     else:
                         testcase_info = TestCaseInfo(name, os)
                         self.fail_testcase_dict[name] = testcase_info
+                        
+                        latest_url = f"https://github.com/{self.repo}/actions/runs/{id}"
+                        self.fail_testcase_dict[name].set_latest_url(latest_url)
                     
-                    latest_url = f"https://github.com/{self.repo}/actions/runs/{id}"
-                    self.fail_testcase_dict[name].set_latest_url(latest_url)
 
     def list_failure_testcase(self):
         print("\n")
