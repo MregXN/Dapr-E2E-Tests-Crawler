@@ -1,3 +1,5 @@
+import os
+
 # Follow the style of "<OWNER>/<REPO>"
 REPO = "dapr/dapr"
 
@@ -5,7 +7,8 @@ REPO = "dapr/dapr"
 WORKFLOW_NAME = "dapr-test.yml"
 
 # Github access token. Must cover the scope of dapr repo"
-ACCSS_TOKEM = "<REPLACE_WITH_YOUR_TOKEN>"
+# Replace it when running locally or add a secret to your repo setting when running in workflow 
+ACCSS_TOKEM = os.getenv("CRAWLER_GITHUB_TOKEN")
 
 # Parameters brought when accessing github API
 GITHUB_API_PARAMETER = {"per_page": "100"}
