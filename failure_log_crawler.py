@@ -46,7 +46,7 @@ class FailureLogCrawler:
         self.fail_testcase_dict = {}
         self.fail_testcase_dict_sorted_list = []
 
-    def crawl(self, failure_id, workflow_len):
+    def crawl_failure_workflow(self, failure_id, workflow_len):
         failure_id_len = len(failure_id)
         for index, id in enumerate(failure_id):
             print(

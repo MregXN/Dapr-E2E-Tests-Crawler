@@ -50,5 +50,5 @@ class WorkFlowScaner:
         return pass_rate
 
     def list_failure_case(self):
-        self.crawler.crawl(self.failure_id, self.runs_len)
+        self.crawler.crawl_failure_workflow(self.failure_id, self.runs_len)
         self.crawler.list_failure_testcase()

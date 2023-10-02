@@ -8,6 +8,8 @@ if __name__ == "__main__":
     )
     components_crawler = ComponentsCrawler(REPO,ACCESS_TOKEN)
     components_crawler.scan_components()
+
+
     # workflow_scaner = WorkFlowScaner(REPO, WORKFLOW_NAME, ACCESS_TOKEN)
     # workflow_scaner.scan_workflow()
 
