@@ -1,4 +1,4 @@
-from global_settings import REPO, WORKFLOW_NAME, ACCESS_TOKEN, OUTPUT_TARGET
+from global_settings import REPO, WORKFLOW_NAME, ACCESS_TOKEN
 from workflow_scan import WorkFlowScaner
 from components_crawler import ComponentsCrawler
 
@@ -7,20 +7,9 @@ if __name__ == "__main__":
         f"Dapr E2E Tests Crawler start. \nREPO : {REPO}  WORKFLOW_NAME : {WORKFLOW_NAME}"
     )
     components_crawler = ComponentsCrawler(REPO,ACCESS_TOKEN)
-    components_crawler.scan_components()
+    workflow_scaner = WorkFlowScaner(REPO, WORKFLOW_NAME, ACCESS_TOKEN)
 
-
-    # workflow_scaner = WorkFlowScaner(REPO, WORKFLOW_NAME, ACCESS_TOKEN)
-    # workflow_scaner.scan_workflow()
-
-    # pass_rate_string = f"\nPass rate of {WORKFLOW_NAME} is " + "{:.2%}\n".format(
-    #     workflow_scaner.get_pass_rate()
-    # )
-    # print(pass_rate_string)
-
-    # with open(OUTPUT_TARGET, "w") as file:
-    #     file.write(pass_rate_string + "\n")
-
-    # print("\nFailure Workflow crawling start:")
-    # workflow_scaner.list_failure_case()
- 
+    workflow_scaner.scan_workflow(components_crawler.scan_components())
+    print("\nFailure Workflow crawling start:")
+    workflow_scaner.list_failure_case()
+    

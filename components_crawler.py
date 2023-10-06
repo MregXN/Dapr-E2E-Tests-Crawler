@@ -18,12 +18,12 @@ class ComponentsCrawler:
         
 
     def scan_components(self):
-        print("\nStart to scan components.\n")
+        print("\nstart to scan components.\n")
         url = f"https://api.github.com/repos/{self.repo}/contents/tests/config/"
         response = requests.get(url, headers=self.headers, params=GITHUB_API_PARAMETER)
         content = response.json()  
         for file in content:  
-            print("loading " + file['name'] + "...")
+            print("scanning " + file['name'] + "...")
             try:
                 file_url = url + file['name']
                 response = requests.get(file_url, headers=self.headers, params=GITHUB_API_PARAMETER)
@@ -47,3 +47,4 @@ class ComponentsCrawler:
         for key in self.app_components_dict:
             self.app_components_dict[key] = set(self.app_components_dict[key])       
 
+        return self.app_components_dict

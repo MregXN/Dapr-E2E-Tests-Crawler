@@ -4,7 +4,7 @@ import sys
 import zipfile
 import re
 from io import BytesIO
-from global_settings import GITHUB_API_PARAMETER
+from global_settings import GITHUB_API_PARAMETER, TESTS_OUTPUT_TARGET
 from failure_log_crawler import FailureLogCrawler
 
 
@@ -25,8 +25,9 @@ class WorkFlowScaner:
         self.failure_id = []
         self.crawler = FailureLogCrawler(repo, access_token)
         self.test_app_dict = {} 
+        self.components_tests_dict = {}
 
-    def scan_workflow(self):
+    def scan_workflow(self,app_components_dict):
         url = f"https://api.github.com/repos/{self.repo}/actions/workflows/{self.workflow_name}/runs"
         response = requests.get(url, headers=self.headers, params=GITHUB_API_PARAMETER)
         runs = json.loads(response.text)["workflow_runs"]
@@ -42,9 +43,9 @@ class WorkFlowScaner:
             else:
                 if run["conclusion"] == "success":
                     self.success_num += 1
-                    # get app names in first success workflow
+                    # get all components of each test in first success workflow
                     if self.success_num == 1:
-                        self.get_test_app_name(run["id"])
+                        self.get_components_tests_dict(run["id"],app_components_dict)
                 elif run["conclusion"] == "failure":
                     self.failure_num += 1
                     self.failure_id.append(run["id"])
@@ -53,6 +54,12 @@ class WorkFlowScaner:
             f"{self.in_progress_num} runs are still in progress, {self.success_num} runs success and {self.failure_num} runs fail"
         )
 
+        pass_rate_string = f"\nPass rate of {self.workflow_name} is " + "{:.2%}\n".format(self.get_pass_rate())
+
+        with open(TESTS_OUTPUT_TARGET, "w") as file:
+            file.write(pass_rate_string + "\n")
+        print(pass_rate_string)
+
     def get_pass_rate(self):
         pass_rate = self.success_num / self.runs_len
         return pass_rate
@@ -60,6 +67,8 @@ class WorkFlowScaner:
     def list_failure_case(self):
         self.crawler.crawl_failure_workflow(self.failure_id, self.runs_len)
         self.crawler.list_failure_testcase()
+        self.crawler.list_failure_components(self.components_tests_dict)
+
 
     def get_test_app_name(self, id):
         print(f"getting app names in workflow {id}")
@@ -105,4 +114,20 @@ class WorkFlowScaner:
                 for k,v in test_dict.items():
                     self.test_app_dict[k] = set(app_dict[v])  
 
-                return self.test_app_dict
+        if not self.test_app_dict:
+            print("artifact \"linux_amd64_e2e.json\" is not existed.")
+        
+    def get_components_tests_dict(self,id,app_components_dict):
+        self.get_test_app_name(id)
+        for test,apps in self.test_app_dict.items():
+            for app in apps:
+                if app in app_components_dict:
+                    for component in app_components_dict[app]:
+                        if component not in self.components_tests_dict:
+                            self.components_tests_dict[component] = []
+                        self.components_tests_dict[component].append(test)
+                else:
+                    print(f"app {app} is not scanned via yaml file, skip")
+
+        for k,_ in self.components_tests_dict.items():
+            self.components_tests_dict[k] = set(self.components_tests_dict[k])  

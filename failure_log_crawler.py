@@ -4,7 +4,7 @@ import json
 import xml.etree.ElementTree as ET
 import zipfile
 from io import BytesIO
-from global_settings import OUTPUT_TARGET
+from global_settings import TESTS_OUTPUT_TARGET,COMPONENTS_OUTPUT_TARGET
 
 
 class TestCaseInfo:
@@ -111,8 +111,7 @@ class FailureLogCrawler:
                         self.fail_testcase_dict[name].set_latest_url(latest_url)
 
     def list_failure_testcase(self):
-        print("\nFailed Test Cases:")
-        with open(OUTPUT_TARGET, "a") as file:
+        with open(TESTS_OUTPUT_TARGET, "a") as file:
             for case in self.fail_testcase_dict_sorted_list:
                 fali_rate_string = (
                     "Fail Rate: "
@@ -128,5 +127,18 @@ class FailureLogCrawler:
                     + str(case.latest_url)
                     + "\n"
                 )
-                print(fali_rate_string)
                 file.write(fali_rate_string + "\n")
+        print("tests result output completed")
+
+    def list_failure_components(self,components_tests_dict):
+        with open(COMPONENTS_OUTPUT_TARGET, "w") as file:
+            for component,tests in components_tests_dict.items():
+                file.write(component + ":\n")
+                for test in tests:
+                    if test in self.fail_testcase_dict:
+                        pass_rate = 1 - self.fail_testcase_dict[test].fail_rate
+                    else: 
+                        pass_rate = 1
+                    file.write( "Pass Rate: "+ "{:.2%}".format(float(pass_rate))+ "     "+ "Test Case: "+ test+ "\n")
+                file.write("\n")
+        print("components result output completed.")
