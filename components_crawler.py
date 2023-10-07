@@ -32,15 +32,25 @@ class ComponentsCrawler:
 
                 yaml_split_string = yaml_string.split("---")
                 for s in yaml_split_string:
-                    data = yaml.safe_load(s)
-                    if data['kind'] != "Component":
-                        continue
+                    if len(s):
+                        data = yaml.safe_load(s)
+                        
+                        if (data is not None) and ('kind' in data):
+                            if data['kind'] != "Component":
+                                print("it is not about component, skip")
+                                continue
 
-                    components_name = data['spec']['type']
-                    for name in data['scopes']:
-                        if name not in self.app_components_dict:
-                            self.app_components_dict[name]=[]
-                        self.app_components_dict[name].append(components_name)
+                            components_name = data['spec']['type']
+                            if 'scopes' in data:
+                                for name in data['scopes']:
+                                    if name not in self.app_components_dict:
+                                        self.app_components_dict[name]=[]
+                                    self.app_components_dict[name].append(components_name)
+                                    print("app "+name+" is added.")
+                            else:
+                                print("No scope is specified for component "+components_name+", skip")
+                        else :
+                            print("it is not a k8s api yaml, skip.")
             except:
                 print("Fail to parse " + file['name'] + ", skip.")
 

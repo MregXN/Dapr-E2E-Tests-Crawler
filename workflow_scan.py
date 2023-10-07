@@ -34,7 +34,7 @@ class WorkFlowScaner:
         response = requests.get(url, headers=self.headers, params=GITHUB_API_PARAMETER)
         runs = json.loads(response.text)["workflow_runs"]
 
-        # ingore workflows triggered manually
+        # ingore the workflows triggered manually
         scheduled_runs = [r for r in runs if r["event"] == "schedule"]
         self.runs_len = len(scheduled_runs)
         print(f"Successfully get {self.runs_len} scheduled runs")
@@ -56,7 +56,7 @@ class WorkFlowScaner:
             f"{self.in_progress_num} runs are still in progress, {self.success_num} runs success and {self.failure_num} runs fail"
         )
 
-        pass_rate_string = f"\nPass rate of {self.workflow_name} is " + "{:.2%}\n".format(self.get_pass_rate())
+        pass_rate_string = f"Pass rate of {self.workflow_name} is " + "{:.2%}\n".format(self.get_pass_rate())
 
         with open(TESTS_OUTPUT_TARGET, "w") as file:
             file.write(pass_rate_string + "\n")
