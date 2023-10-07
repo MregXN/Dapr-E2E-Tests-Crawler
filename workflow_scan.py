@@ -6,6 +6,7 @@ import re
 from io import BytesIO
 from global_settings import GITHUB_API_PARAMETER, TESTS_OUTPUT_TARGET
 from failure_log_crawler import FailureLogCrawler
+from components_crawler import ComponentsCrawler
 
 
 class WorkFlowScaner:
@@ -23,11 +24,12 @@ class WorkFlowScaner:
         self.success_num = 0
         self.failure_num = 0
         self.failure_id = []
-        self.crawler = FailureLogCrawler(repo, access_token)
+        self.failure_log_crawler = FailureLogCrawler(repo, access_token)
+        self.components_crawler = ComponentsCrawler(repo, access_token)
         self.test_app_dict = {} 
         self.components_tests_dict = {}
 
-    def scan_workflow(self,app_components_dict):
+    def scan_workflow(self):
         url = f"https://api.github.com/repos/{self.repo}/actions/workflows/{self.workflow_name}/runs"
         response = requests.get(url, headers=self.headers, params=GITHUB_API_PARAMETER)
         runs = json.loads(response.text)["workflow_runs"]
@@ -45,7 +47,7 @@ class WorkFlowScaner:
                     self.success_num += 1
                     # get all components of each test in first success workflow
                     if self.success_num == 1:
-                        self.get_components_tests_dict(run["id"],app_components_dict)
+                        self.get_components_tests_dict(run["id"])
                 elif run["conclusion"] == "failure":
                     self.failure_num += 1
                     self.failure_id.append(run["id"])
@@ -65,9 +67,9 @@ class WorkFlowScaner:
         return pass_rate
 
     def list_failure_case(self):
-        self.crawler.crawl_failure_workflow(self.failure_id, self.runs_len)
-        self.crawler.list_failure_testcase()
-        self.crawler.list_failure_components(self.components_tests_dict)
+        self.failure_log_crawler.crawl_failure_workflow(self.failure_id, self.runs_len)
+        self.failure_log_crawler.list_failure_testcase()
+        self.failure_log_crawler.list_failure_components(self.components_tests_dict)
 
 
     def get_test_app_name(self, id):
@@ -117,7 +119,8 @@ class WorkFlowScaner:
         if not self.test_app_dict:
             print("artifact \"linux_amd64_e2e.json\" is not existed.")
         
-    def get_components_tests_dict(self,id,app_components_dict):
+    def get_components_tests_dict(self,id):
+        app_components_dict = self.components_crawler.scan_components()
         self.get_test_app_name(id)
         for test,apps in self.test_app_dict.items():
             for app in apps:
