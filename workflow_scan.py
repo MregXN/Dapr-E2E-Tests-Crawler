@@ -26,7 +26,7 @@ class WorkFlowScaner:
         self.failure_id = []
         self.failure_log_crawler = FailureLogCrawler(repo, access_token)
         self.components_crawler = ComponentsCrawler(repo, access_token)
-        self.test_app_dict = {} 
+        self.test_app_dict = {}
         self.components_tests_dict = {}
 
     def scan_workflow(self):
@@ -56,7 +56,9 @@ class WorkFlowScaner:
             f"{self.in_progress_num} runs are still in progress, {self.success_num} runs success and {self.failure_num} runs fail"
         )
 
-        pass_rate_string = f"Pass rate of {self.workflow_name} is " + "{:.2%}\n".format(self.get_pass_rate())
+        pass_rate_string = f"Pass rate of {self.workflow_name} is " + "{:.2%}\n".format(
+            self.get_pass_rate()
+        )
 
         with open(TESTS_OUTPUT_TARGET, "w") as file:
             file.write(pass_rate_string + "\n")
@@ -70,7 +72,6 @@ class WorkFlowScaner:
         self.failure_log_crawler.crawl_failure_workflow(self.failure_id, self.runs_len)
         self.failure_log_crawler.list_failure_testcase()
         self.failure_log_crawler.list_failure_components(self.components_tests_dict)
-
 
     def get_test_app_name(self, id):
         print(f"getting app names in workflow {id}")
@@ -95,34 +96,36 @@ class WorkFlowScaner:
                         f"Error occurred when parse {artifact_name}, skiped"
                     )
                     return
-                
+
                 pattern_app_name = r'github.com/dapr/dapr/tests/e2e/(.*?)".*?\\"AppName\\":\\"(.*?)\\",'
-                pattern_test_name = r'github.com/dapr/dapr/tests/e2e/(.*?)".*?=== RUN   (.*?)\\n"'
-                with open(extracted_file, 'r') as f:  
+                pattern_test_name = (
+                    r'github.com/dapr/dapr/tests/e2e/(.*?)".*?=== RUN   (.*?)\\n"'
+                )
+                with open(extracted_file, "r") as f:
                     content = f.read()
-                    matches_app_name = re.findall(pattern_app_name,content)
-                    matched_test_name = re.findall(pattern_test_name,content)
-                
+                    matches_app_name = re.findall(pattern_app_name, content)
+                    matched_test_name = re.findall(pattern_test_name, content)
+
                 app_dict = {}
                 for m in matches_app_name:
                     if m[0] not in app_dict:
-                        app_dict[m[0]]=[]
+                        app_dict[m[0]] = []
                     app_dict[m[0]].append(m[1])
-                
+
                 test_dict = {}
                 for m in matched_test_name:
-                    test_dict[m[1]]=m[0]
+                    test_dict[m[1]] = m[0]
 
-                for k,v in test_dict.items():
-                    self.test_app_dict[k] = set(app_dict[v])  
+                for k, v in test_dict.items():
+                    self.test_app_dict[k] = set(app_dict[v])
 
         if not self.test_app_dict:
-            print("artifact \"linux_amd64_e2e.json\" is not existed.")
-        
-    def get_components_tests_dict(self,id):
+            print('artifact "linux_amd64_e2e.json" is not existed.')
+
+    def get_components_tests_dict(self, id):
         app_components_dict = self.components_crawler.scan_components()
         self.get_test_app_name(id)
-        for test,apps in self.test_app_dict.items():
+        for test, apps in self.test_app_dict.items():
             for app in apps:
                 if app in app_components_dict:
                     for component in app_components_dict[app]:
@@ -132,5 +135,7 @@ class WorkFlowScaner:
                 else:
                     print(f"app {app} is not using dapr components, skip")
 
-        for k,_ in self.components_tests_dict.items():
-            self.components_tests_dict[k] = set(self.components_tests_dict[k])  
+        for k, _ in self.components_tests_dict.items():
+            self.components_tests_dict[k] = sorted(set(self.components_tests_dict[k]))
+
+        print("test")

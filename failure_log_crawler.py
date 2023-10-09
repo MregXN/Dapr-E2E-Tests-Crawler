@@ -4,7 +4,7 @@ import json
 import xml.etree.ElementTree as ET
 import zipfile
 from io import BytesIO
-from global_settings import TESTS_OUTPUT_TARGET,COMPONENTS_OUTPUT_TARGET
+from global_settings import TESTS_OUTPUT_TARGET, COMPONENTS_OUTPUT_TARGET
 
 
 class TestCaseInfo:
@@ -50,9 +50,11 @@ class FailureLogCrawler:
         failure_id_len = len(failure_id)
         for index, id in enumerate(failure_id):
             print(
-                f"({index+1}/{failure_id_len}) crawling failure workflow... workflow id is "
+                f"({index+1}/{failure_id_len}) crawling failure workflow "
                 + str(id)
+                + "..."
             )
+        
             url = (
                 f"https://api.github.com/repos/{self.repo}/actions/runs/{id}/artifacts"
             )
@@ -93,6 +95,24 @@ class FailureLogCrawler:
         tree = ET.parse(extracted_file)
 
         root = tree.getroot()
+
+        # failures occur in TestMain
+        if root.attrib["failures"] == "1":
+            os = artifact["name"].split("_")[0]
+            name = "TestMain"
+            
+            if name in self.fail_testcase_dict:
+                self.fail_testcase_dict[name].update_os(os)
+                self.fail_testcase_dict[name].increase_fail_times()
+            else:
+                testcase_info = TestCaseInfo(name, os)
+                self.fail_testcase_dict[name] = testcase_info
+
+                latest_url = f"https://github.com/{self.repo}/actions/runs/{id}"
+                self.fail_testcase_dict[name].set_latest_url(latest_url)
+
+            return 
+
         for testsuite in root:
             failures = int(testsuite.attrib["failures"])
             if failures:
@@ -130,15 +150,22 @@ class FailureLogCrawler:
                 file.write(fali_rate_string + "\n")
         print("tests result output completed")
 
-    def list_failure_components(self,components_tests_dict):
+    def list_failure_components(self, components_tests_dict):
         with open(COMPONENTS_OUTPUT_TARGET, "w") as file:
-            for component,tests in components_tests_dict.items():
+            for component, tests in components_tests_dict.items():
                 file.write(component + ":\n")
                 for test in tests:
                     if test in self.fail_testcase_dict:
                         pass_rate = 1 - self.fail_testcase_dict[test].fail_rate
-                    else: 
+                    else:
                         pass_rate = 1
-                    file.write( "Pass Rate: "+ "{:.2%}".format(float(pass_rate))+ "     "+ "Test Case: "+ test+ "\n")
+                    file.write(
+                        "Pass Rate: "
+                        + "{:.2%}".format(float(pass_rate))
+                        + "     "
+                        + "Test Case: "
+                        + test
+                        + "\n"
+                    )
                 file.write("\n")
         print("components result output completed.")
