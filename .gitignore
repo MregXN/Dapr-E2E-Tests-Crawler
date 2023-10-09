@@ -6,4 +6,5 @@ test_report_e2e.xml
 test_report_e2e.json
 tests.txt
 components.txt
+result.tar
 global_settings.py

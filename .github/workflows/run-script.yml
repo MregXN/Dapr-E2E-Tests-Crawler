@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest  
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-      TESTS_OUTPUT_TARGET: "tests.txt"
-      COMPONENTS_OUTPUT_TARGET: "components.txt"
     steps:  
     - name: Checkout code  
       uses: actions/checkout@v3
@@ -29,16 +27,14 @@ jobs:
     - name: Run Script
       run: python3 __init__.py
 
-    - name: Upload tests results
+    - name: Compress logs
       if: always()
-      uses: actions/upload-artifact@master
-      with:
-        name: "tests result" 
-        path: ${{ env.TESTS_OUTPUT_TARGET }}
+      run: |
+        tar -cvf result.tar tests.txt components.txt
 
-    - name: Upload components results
+    - name: Upload results
       if: always()
       uses: actions/upload-artifact@master
       with:
-        name: "components result" 
-        path: ${{ env.COMPONENTS_OUTPUT_TARGET }}
+        name: "result" 
+        path: "result.tar"
