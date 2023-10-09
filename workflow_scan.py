@@ -130,7 +130,7 @@ class WorkFlowScaner:
                             self.components_tests_dict[component] = []
                         self.components_tests_dict[component].append(test)
                 else:
-                    print(f"app {app} is not scanned via yaml file, skip")
+                    print(f"app {app} is not using dapr components, skip")
 
         for k,_ in self.components_tests_dict.items():
             self.components_tests_dict[k] = set(self.components_tests_dict[k])  

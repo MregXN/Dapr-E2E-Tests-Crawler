@@ -23,7 +23,7 @@ class ComponentsCrawler:
         response = requests.get(url, headers=self.headers, params=GITHUB_API_PARAMETER)
         content = response.json()  
         for file in content:  
-            print("scanning " + file['name'] + "...")
+            print("\nscanning " + file['name'] + "...")
             try:
                 file_url = url + file['name']
                 response = requests.get(file_url, headers=self.headers, params=GITHUB_API_PARAMETER)
