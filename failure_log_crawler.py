@@ -45,6 +45,7 @@ class FailureLogCrawler:
         }
         self.fail_testcase_dict = {}
         self.fail_testcase_dict_sorted_list = []
+        self.workflow_with_no_artifact = []
 
     def crawl_failure_workflow(self, failure_id, workflow_len):
         failure_id_len = len(failure_id)
@@ -54,7 +55,7 @@ class FailureLogCrawler:
                 + str(id)
                 + "..."
             )
-        
+
             url = (
                 f"https://api.github.com/repos/{self.repo}/actions/runs/{id}/artifacts"
             )
@@ -64,12 +65,17 @@ class FailureLogCrawler:
             except:
                 print("JSON decode error occured when get artifacts.")
                 continue
-            for artifact in artifacts:
-                if (
-                    artifact["name"] == "linux_amd64_e2e.json"
-                    or artifact["name"] == "windows_amd64_e2e.json"
-                ):
-                    self.parse_artifact(artifact, id)
+
+            if len(artifacts) == 0:
+                print("workflow " + str(id) + " does not upload any artifacts, skip.")
+                self.workflow_with_no_artifact.append(id)
+            else:
+                for artifact in artifacts:
+                    if (
+                        artifact["name"] == "linux_amd64_e2e.json"
+                        or artifact["name"] == "windows_amd64_e2e.json"
+                    ):
+                        self.parse_artifact(artifact, id)
 
         for v in self.fail_testcase_dict.values():
             v.get_fail_rate(workflow_len)
@@ -100,7 +106,7 @@ class FailureLogCrawler:
         if root.attrib["failures"] == "1":
             os = artifact["name"].split("_")[0]
             name = "TestMain"
-            
+
             if name in self.fail_testcase_dict:
                 self.fail_testcase_dict[name].update_os(os)
                 self.fail_testcase_dict[name].increase_fail_times()
@@ -111,7 +117,7 @@ class FailureLogCrawler:
                 latest_url = f"https://github.com/{self.repo}/actions/runs/{id}"
                 self.fail_testcase_dict[name].set_latest_url(latest_url)
 
-            return 
+            return
 
         for testsuite in root:
             failures = int(testsuite.attrib["failures"])
@@ -148,6 +154,11 @@ class FailureLogCrawler:
                     + "\n"
                 )
                 file.write(fali_rate_string + "\n")
+
+            file.write("\nWorkflows without any artifact: \n")
+            for idx, id in enumerate(self.workflow_with_no_artifact):
+                file.write(f"{idx}: https://github.com/{self.repo}/actions/runs/{id}\n")
+
         print("tests result output completed")
 
     def list_failure_components(self, components_tests_dict):
