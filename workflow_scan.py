@@ -96,7 +96,7 @@ class WorkFlowScaner:
                     )
                     return
                 
-                pattern_app_name = r'github.com/dapr/dapr/tests/e2e/(.*?)".*?e2e-(.*?):dapr'
+                pattern_app_name = r'github.com/dapr/dapr/tests/e2e/(.*?)".*?\\"AppName\\":\\"(.*?)\\",'
                 pattern_test_name = r'github.com/dapr/dapr/tests/e2e/(.*?)".*?=== RUN   (.*?)\\n"'
                 with open(extracted_file, 'r') as f:  
                     content = f.read()
