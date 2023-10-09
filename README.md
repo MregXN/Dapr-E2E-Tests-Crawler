@@ -5,6 +5,8 @@ This crawler is able to calculate the following characteristics:
 - Conclusions and pass rate of recent E2E tests workflows
 - List of Failed test case
 - Failure rate of each failed test case and its latest workflow URL
+- URL of the workflow without failure logs
+- Dapr components used in testing and each test cases
   
 By utilizing this script, identifying flaky tests becomes a simpler task. It can be used after making repairs to the test environment to gauge the extent of improvement brought about by the modifications.
 
@@ -45,38 +47,56 @@ python3 __init__.py
 ```
 
 ## Result
-This script will generate results in log.txt:
+This script will generate test results in tests.txt:
 ```
 
-Pass rate of dapr-test.yml is 5.00%
+Pass rate of dapr-test.yml is 80.26%
+
+Fail Rate: 5.26%     Test Case: TestMain
+Operating System: linux/windows     Latest URL: https://github.com/dapr/dapr/actions/runs/6428649662
+
+Fail Rate: 2.63%     Test Case: TestActorFeatures/Get_actor_metadata
+Operating System: windows     Latest URL: https://github.com/dapr/dapr/actions/runs/6451945968
+
+Fail Rate: 2.63%     Test Case: TestActorFeatures
+Operating System: windows     Latest URL: https://github.com/dapr/dapr/actions/runs/6451945968
 
 
-Failed Test Cases:
-Fail Rate: 38.00%     Test Case: TestActorMetadataEtagRace/Triggers_rebalance_of_reminders_multiple_times_to_validate_eTag_race_on_metadata_record.
-Operating System: linux/windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746253044
-
-Fail Rate: 38.00%     Test Case: TestActorMetadataEtagRace
-Operating System: linux/windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746253044
-
-Fail Rate: 25.00%     Test Case: TestServiceInvocationExternally/serviceinvocation-callee-external/Test_HTTP_to_HTTPS_Externally_using_HTTP_Endpoint_CRD
-Operating System: windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746307186
-
-Fail Rate: 25.00%     Test Case: TestServiceInvocationExternally/serviceinvocation-callee-external
-Operating System: windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746307186
-
-Fail Rate: 25.00%     Test Case: TestServiceInvocationExternally
-Operating System: windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746307186
-
-Fail Rate: 21.00%     Test Case: TestActorReminder
-Operating System: linux/windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746279502
-
-Fail Rate: 18.00%     Test Case: TestActorReminder/Actor_reminder_unregister_then_restart_should_not_trigger_anymore.
-Operating System: linux/windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5746279502
-
-Fail Rate: 6.00%     Test Case: TestActorFeatures
-Operating System: windows     Latest URL: https://github.com/MregXN/dapr/actions/runs/5740828818
+Workflows without any artifact: 
+0: https://github.com/dapr/dapr/actions/runs/6414198198
+1: https://github.com/dapr/dapr/actions/runs/6301376989
+2: https://github.com/dapr/dapr/actions/runs/6298580586
+3: https://github.com/dapr/dapr/actions/runs/6296122715
+4: https://github.com/dapr/dapr/actions/runs/6294452525
+5: https://github.com/dapr/dapr/actions/runs/6292975025
+6: https://github.com/dapr/dapr/actions/runs/6289716020
+7: https://github.com/dapr/dapr/actions/runs/6286547576
 ...
 ``` 
+
+Generate components results in components.txt:
+```
+
+state.postgres:
+Pass Rate: 100.00%     Test Case: TestActorActivation
+Pass Rate: 100.00%     Test Case: TestActorActivation/Actor_deactivates_due_to_timeout.
+Pass Rate: 100.00%     Test Case: TestActorActivation/Actor_does_not_deactivate_since_there_is_no_timeout.
+Pass Rate: 97.37%     Test Case: TestActorFeatures
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_concurrency_different_actor_ids.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_concurrency_same_actor_id.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_fails_over_to_another_hostname.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_rebalance_to_another_hostname.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reminder.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reminder_delete_self.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reminder_with_app_restart.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reminder_with_deactivate.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reset_reminder.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_reset_timer.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_single_fire_reminder.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_state.
+Pass Rate: 100.00%     Test Case: TestActorFeatures/Actor_timer.
+...
+```
 
 ## License
  
